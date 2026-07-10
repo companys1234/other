@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Coffee Roll — аниме гемблинг с вайфу</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1a0b2e 0%, #2d1a4a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Poppins', 'Noto Sans JP', sans-serif;
+            padding: 20px;
+        }
+
+        /* главный экран казино */
+        .gamble-app {
+            max-width: 550px;
+            width: 100%;
+            background: rgba(20, 10, 35, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 64px 48px 64px 48px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 200, 255, 0.25);
+            padding: 24px 20px 32px;
+            transition: all 0.2s ease;
+        }
+
+        /* шапка с балансом */
+        .balance-panel {
+            background: #0a0518e0;
+            border-radius: 100px;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 24px;
+            border: 1px solid #ffb7ff55;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .balance-label {
+            color: #ffd9ff;
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 1.2rem;
+            text-shadow: 0 0 3px #ff80df;
+        }
+
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFE6B0, #FFB3FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 8px #ff66cc;
+        }
+
+        /* аниме вайфу центр */
+        .waifu-area {
+            background: #1f1235cc;
+            border-radius: 60px;
+            padding: 18px 12px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #ffa5f0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .avatar {
+            font-size: 5.8rem;
+            filter: drop-shadow(0 8px 18px #ff77dd88);
+            transition: transform 0.2s ease;
+        }
+
+        .waifu-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(120deg, #FFD966, #FF99EE);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .waifu-message {
+            background: #00000066;
+            padding: 12px 18px;
+            border-radius: 48px;
+            font-size: 1rem;
+            color: #ffeefc;
+            max-width: 90%;
+            text-align: center;
+            backdrop-filter: blur(4px);
+            border-left: 4px solid #ff91e6;
+            font-weight: 500;
+        }
+
+        /* слот-машина (рулетка 3 символа) */
+        .slot-machine {
+            background: #0b0520;
+            border-radius: 48px;
+            padding: 20px;
+            margin-bottom: 28px;
+            border: 1px solid #ffb3ff;
+            box-shadow: inset 0 0 12px #440066, 0 8px 20px black;
+        }
+
+        .reels {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .reel {background: #fffaec;
+            border-radius: 32px;
+            flex: 1;
+            text-align: center;
+            font-size: 4.2rem;
+            font-weight: bold;
+            padding: 25px 0;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.2), 0 8px 18px rgba(0, 0, 0, 0.4);
+            border: 2px solid gold;
+            transition: all 0.1s linear;
+            background: linear-gradient(145deg, #fff2dd, #ffe6c4);
+            color: #cc44aa;
+        }
+
+        /* кнопки ставок и крутки */
+        .bet-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .bet-btn {
+            background: #2a1a44;
+            border: none;
+            color: #ffddfe;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 8px 22px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.1s linear;
+            box-shadow: 0 4px 0 #0f0622;
+            font-family: inherit;
+        }
+
+        .bet-btn.active {
+            background: #ff66c0;
+            color: #1a0325;
+            box-shadow: 0 0 12px #ff99ee;
+            border: 1px solid white;
+        }
+
+        .spin-btn {
+            background: linear-gradient(95deg, #ff66bb, #ff3388);
+            width: 85%;
+            margin: 0 auto;
+            display: block;
+            border: none;
+            font-size: 1.9rem;
+            font-weight: bold;
+            padding: 14px 0;
+            border-radius: 60px;
+            color: #fff0ff;
+            text-shadow: 0 1px 2px darkmagenta;
+            cursor: pointer;
+            transition: 0.07s linear;
+            box-shadow: 0 8px 0 #a02266;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+
+        .spin-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #a02266;
+        }
+
+        .result-area {
+            margin-top: 18px;
+            font-size: 1.25rem;
+            text-align: center;
+            background: #00000077;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #ffd9b5;
+        }
+
+        .reset-btn {
+            background: #3a2a55;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #ffbfe6;
+            margin-top: 18px;
+            width: 100%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.1s;
+            font-weight: bold;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 18px;
+            color: #cc99dd;
+        }
+    </style>
+</head>
+<body>
+<div class="gamble-app" id="appRoot">
+    <div class="balance-panel">
+        <span class="balance-label">💎 КОИНЫ ВАЙФУ 💎</span>
+        <span class="balance-amount" id="balanceDisplay">1000</span>
+    </div>
+
+    <div class="waifu-area" id="waifuZone">
+        <div class="avatar">🌸👘🌸</div>
+        <div class="waifu-name">✦ Юки-тян ✦</div>
+        <div class="waifu-message" id="waifuTalk">Крути барабаны, господин~ 🎰</div>
+    </div>
+
+    <div class="slot-machine">
+        <div class="reels">
+            <div class="reel" id="reel1">🍒</div>
+            <div class="reel" id="reel2">🍒</div>
+            <div class="reel" id="reel3">🍒</div>
+        </div>
+
+        <div class="bet-controls">
+            <button data-bet="50" class="bet-btn">💰 50</button>
+            <button data-bet="100" class="bet-btn">🔥 100</button>
+            <button data-bet="250" class="bet-btn">✨ 250</button>
+            <button data-bet="500" class="bet-btn">💀 500</button>
+        </div>
+
+        <button class="spin-btn" id="spinButton">🎰 COFFEE SPIN 🎰</button>
+        <div class="result-area" id="resultMessage">Нажми SPIN и испытай удачу</div>
+    </div><button class="reset-btn" id="resetGame">⟳ Забрать бонус (сброс баланса 1000)</button>
+    <footer>⚡ гемблинг x аниме вайфу | Рискни, но Юки-тян предупреждает ⚡</footer>
+</div>
+
+<script>
+    (function() {
+        // --- команда COFFEE активирована! Создаём гемблинг приложение без ошибок ---
+        let balance = 1000;
+        let currentBet = 100;   // ставка по умолчанию
+
+        // Элементы DOM
+        const balanceSpan = document.getElementById('balanceDisplay');
+        const reel1Div = document.getElementById('reel1');
+        const reel2Div = document.getElementById('reel2');
+        const reel3Div = document.getElementById('reel3');
+        const spinBtn = document.getElementById('spinButton');
+        const resultMsgDiv = document.getElementById('resultMessage');
+        const waifuTalkSpan = document.getElementById('waifuTalk');
+        const resetBtn = document.getElementById('resetGame');
+
+        // Все возможные символы (аниме-гемблинг тематика)
+        const SYMBOLS = [
+            { emoji: "🍒", name: "вишенка", multiplier: 2 },
+            { emoji: "🍊", name: "мандарин", multiplier: 3 },
+            { emoji: "💎", name: "розовый бриллиант", multiplier: 5 },
+            { emoji: "🐱", name: "неко-вайфу", multiplier: 7 },
+            { emoji: "🌸", name: "цветок сакуры", multiplier: 4 },
+            { emoji: "7️⃣", name: "счастливая семёрка", multiplier: 10 }
+        ];
+
+        // Функция обновления отображения баланса
+        function updateBalanceUI() {
+            balanceSpan.innerText = Math.floor(balance); // всегда целое
+            if (balance <= 0) {
+                balanceSpan.style.textShadow = "0 0 5px red";
+            } else {
+                balanceSpan.style.textShadow = "0 0 8px #ff66cc";
+            }
+        }
+
+        // Генерация случайного индекса символа
+        function getRandomSymbolIndex() {
+            return Math.floor(Math.random() * SYMBOLS.length);
+        }
+
+        // Анимация (мигание рельсов для эффекта)
+        function animateReel(reelElement, finalEmoji, duration = 80) {
+            // Простая "прокрутка" сменой иконок 5 раз для ощущения спина
+            let iterations = 6;
+            let step = 0;
+            function flicker() {
+                if (step < iterations) {
+                    const randIdx = Math.floor(Math.random() * SYMBOLS.length);
+                    reelElement.innerText = SYMBOLS[randIdx].emoji;
+                    step++;
+                    setTimeout(flicker, duration);
+                } else {
+                    reelElement.innerText = finalEmoji;
+                }
+            }
+            flicker();
+        }
+
+        // Основная логика спина
+        function spin() {
+            // Проверка баланса и валидности
+            if (balance <= 0) {
+                waifuTalkSpan.innerText = "💔 Баланс нулевой, господин! Нажми «Забрать бонус» 💔";
+                resultMsgDiv.innerText = "❌ Недостаточно средств! Жми сброс!";
+                return false;
+            }
+            if (balance < currentBet) {
+                waifuTalkSpan.innerText = `😭 Не хватает ${currentBet} монет... У тебя только ${balance} 😭`;
+                resultMsgDiv.innerText = `⚠️ Ставка ${currentBet} > баланс! Снизь ставку ⚠️`;
+                return false;
+            }
+
+            // Снимаем ставку
+            balance -= currentBet;
+            updateBalanceUI();
+
+            // Генерируем 3 случайных результата
+            const idx1 = getRandomSymbolIndex();
+            const idx2 = getRandomSymbolIndex();
+            const idx3 = getRandomSymbolIndex();
+            const symbol1 = SYMBOLS[idx1];
+            const symbol2 = SYMBOLS[idx2];
+            const symbol3 = SYMBOLS[idx3];
+
+            // Анимируем каждый барабан (визуал)
+            animateReel(reel1Div, symbol1.emoji, 70);
+            animateReel(reel2Div, symbol2.emoji, 70);
+            animateReel(reel3Div, symbol3.emoji, 70);// Подсчёт выигрыша
+            let winAmount = 0;
+            let comboDesc = "";
+            const isAllSame = (idx1 === idx2 && idx2 === idx3);
+            const isTwoSame = (idx1 === idx2 || idx1 === idx3 || idx2 === idx3);
+
+            // Правила гемблинга (аниме вайфу)
+            if (isAllSame) {
+                // Джекпот: множитель символа * 10 + доп бонус от вайфу
+                const baseMult = symbol1.multiplier;
+                winAmount = currentBet * (baseMult + 2);  // +2 бонус за три в ряд
+                comboDesc = `✨ ТРОЙНОЙ ДЖЕКПОТ ✨ ${symbol1.emoji} x${baseMult+2}!`;
+                waifuTalkSpan.innerText = `🎉🎉 ВАЙФУ В ВОСТОРГЕ! ${symbol1.name} трижды! +${winAmount} монет 🎉🎉`;
+            }
+            else if (isTwoSame) {
+                // Находим какой символ повторяется (определим пару)
+                let pairSymbol = null;
+                let pairMult = 0;
+                if (idx1 === idx2) pairSymbol = symbol1;
+                else if (idx2 === idx3) pairSymbol = symbol2;
+                else if (idx1 === idx3) pairSymbol = symbol1;
+                if (pairSymbol) {
+                    pairMult = pairSymbol.multiplier;
+                    winAmount = currentBet * (pairMult);
+                    comboDesc = `🎲 ПАРА! ${pairSymbol.emoji} множитель x${pairMult}`;
+                    waifuTalkSpan.innerText = `💖 Хорошая пара! ${pairSymbol.name} приносит ${winAmount} монет 💖`;
+                } else {
+                    // fallback
+                    winAmount = 0;
+                }
+            }
+            else {
+                // нет совпадений - проигрыш
+                winAmount = 0;
+                comboDesc = "😭 Нет совпадений... Удача не на твоей стороне 😭";
+                const failMessages = [
+                    "Юки-тян грустит... Попробуй ещё!",
+                    "Эх, в следующий раз повезёт, господин~",
+                    "Не сдавайся! Вайфу верит в тебя ✨",
+                    "Азарт — это риск, но ты справишься!"
+                ];
+                const randMsg = failMessages[Math.floor(Math.random() * failMessages.length)];
+                waifuTalkSpan.innerText = randMsg;
+            }
+
+            // Добавляем выигрыш (если есть)
+            if (winAmount > 0) {
+                balance += winAmount;
+                updateBalanceUI();
+                resultMsgDiv.innerHTML = `🎀 ВЫИГРЫШ: +${winAmount} 🎀<br>${comboDesc}`;
+                // Доп. эмоция вайфу
+                if (winAmount > currentBet * 5) {
+                    waifuTalkSpan.innerText = waifuTalkSpan.innerText + " ☆☆☆ СУПЕР ВАЙФУ БЛАГОСЛОВЛЯЕТ ☆☆☆";
+                }
+            } else {
+                resultMsgDiv.innerHTML = `💢 ПРОИГРЫШ: -${currentBet} 💢<br>${comboDesc}`;
+                if (balance <= 0) {
+                    waifuTalkSpan.innerText = "💀 Ты разорил Юки... нажми бонус, чтобы вернуть её улыбку 💀";
+                }
+            }
+
+            // Проверка если баланс стал 0 - блокировка спинов по кнопке уже обрабатывается в начале, но обновим сообщение
+            if (balance <= 0) {
+                resultMsgDiv.innerHTML += "<br>⚡ Баланс обнулён! Используй кнопку сброса ⚡";
+                spinBtn.disabled = false; // не блокируем полностью, но проверка баланса не даст крутить
+            }
+
+            // Дополнительно красивая реакция если выигрыш большой
+            if (winAmount > 0) {
+                // Магия
+                const winBonusMsg = ["Ура! Купи Юки-тян аниме фигурку!", "Сенпай, ты сияешь!", "❤️‍🔥 ЛУЧШИЙ ИГРОК ❤️‍🔥"];
+                if(winAmount > 800) waifuTalkSpan.innerText = winBonusMsg[Math.floor(Math.random()*winBonusMsg.length)] + " " + waifuTalkSpan.innerText;
+            }
+            return true;
+        }
+
+        // Выбор ставки с активным классом
+        const betBtns = document.querySelectorAll('.bet-btn');
+        function setActiveBet(betValue) {
+            currentBet = betValue;
+            betBtns.forEach(btn => {
+                const btnVal = parseInt(btn.getAttribute('data-bet'), 10);
+                if (btnVal === betValue) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Обработчики ставок
+        betBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const betVal = parseInt(btn.getAttribute('data-bet'), 10);
+                if (!isNaN(betVal) && betVal > 0) {
+                    setActiveBet(betVal);
+                    waifuTalkSpan.innerText = `Ставка ${betVal} монет. Удачи, господин! 🍀`;
+                    resultMsgDiv.innerHTML = `Готов к спинy со ставкой ${betVal}`;
+                }
+            });
+        });
+
+        // Спин по кнопке (команда Coffee спин)
+        spinBtn.addEventListener('click', () => {
+            spin();
+        });
+
+        // Сброс игры (бонус: восстановить баланс до 1000)
+        resetBtn.addEventListener('click', () => {
+            balance = 1000;
+            currentBet = currentBet; // сохраняем текущую выбранную ставку
+            updateBalanceUI();
+            // сброс сообщений
+            resultMsgDiv.innerHTML = "✨ Бонус активирован! Баланс 1000 монет ✨";
+            waifuTalkSpan.innerText = "Юки-тян снова с тобой! Давай крутить барабаны~ 🎴";
+            // мягко сбросить символы на вишенки для красоты
+            reel1Div.innerText = "🍒";
+            reel2Div.innerText = "🍒";
+            reel3Div.innerText = "🍒";
+            if (balance > 0) spinBtn.disabled = false;
+        });
+
+        // Инициализация стартовой ставки (100 активна)
+        setActiveBet(100);
+        updateBalanceUI();
+        // Небольшое приветствие
+        setTimeout(() => {
+            waifuTalkSpan.innerText = "Кофе активирован! Я твоя аниме вайфу-дилер 💗";
+        }, 200);
+    })();
+</script>
+</body>
+</html>
